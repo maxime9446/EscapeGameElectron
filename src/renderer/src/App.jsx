@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, {useEffect, useState} from "react";
-import {format} from 'date-fns';
+import {format, isSameDay} from 'date-fns';
 import {fr} from 'date-fns/locale';
 
 function App() {
@@ -9,9 +9,12 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:1337/api/parts-of-days?populate=*")
+      .get('http://localhost:1337/api/parts-of-days?populate=*')
       .then((response) => {
-        setPartsOfDays(response.data.data);
+        const partsOfDays = response.data.data.filter((partOfDay) =>
+          isSameDay(new Date(partOfDay.attributes.day), new Date())
+        );
+        setPartsOfDays(partsOfDays);
       })
       .catch((error) => {
         console.error(error);
@@ -19,9 +22,13 @@ function App() {
   }, []);
 
   const exportPartsOfDays = () => {
-
-    const exportData = partsOfDays.map(
-      (partOfDay) => `${partOfDay.attributes.scenario.data.attributes.title}, ${format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}, ${format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}, ${partOfDay.attributes.status}\n`
+    const today = new Date().setHours(0, 0, 0, 0); // Récupère la date d'aujourd'hui à minuit
+    const todayPartsOfDays = partsOfDays.filter(
+      (partOfDay) => new Date(partOfDay.attributes.day).setHours(0, 0, 0, 0) === today
+    );
+    const exportData = todayPartsOfDays.map(
+      (partOfDay) =>
+        `${partOfDay.attributes.scenario.data.attributes.title}, ${format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}, ${format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}, ${partOfDay.attributes.status}\n`
     );
     const dataBlob = new Blob([exportData], {type: "text/plain"});
     const url = URL.createObjectURL(dataBlob);
@@ -36,7 +43,10 @@ function App() {
     axios
       .get("http://localhost:1337/api/parts-of-days?populate=*")
       .then((response) => {
-        setPartsOfDays(response.data.data);
+        const partsOfDays = response.data.data.filter((partOfDay) =>
+          isSameDay(new Date(partOfDay.attributes.day), new Date())
+        );
+        setPartsOfDays(partsOfDays);
       })
       .catch((error) => {
         console.error(error);
@@ -115,7 +125,7 @@ function App() {
   return (
     <div className="container mx-auto p-8">
       <h1
-        className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-center">
+        className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-black text-center">
         Liste des parties de la journée
       </h1>
 
