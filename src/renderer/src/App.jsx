@@ -56,6 +56,18 @@ function App() {
     container.style.zoom = `${newZoom}%`;
   };
 
+  const updatePartOfDayStatus = (partOfDayId, newStatus) => {
+    axios
+      .put(`http://localhost:1337/api/parts-of-days/${partOfDayId}`, {
+        status: newStatus
+      })
+      .then(() => {
+        reloadPartsOfDays();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   const stopPartOfDay = (partOfDayId) => {
     if (window.confirm("Are you sure you want to stop this part of day?")) {
       axios
@@ -67,6 +79,24 @@ function App() {
           console.error(error);
         });
     }
+  };
+
+  const handleStatusChange = (partOfDayId, partOfDay) => {
+    const updatedPartOfDay = {
+      id: partOfDayId,
+      day: partOfDay.attributes.day,
+      scenario: partOfDay.attributes.scenario,
+      status: partOfDay.attributes.status === "not_started" ? "in_progress" : "completed",
+    };
+    console.log(updatedPartOfDay)
+    axios
+      .put(`http://localhost:1337/api/parts-of-days/${partOfDayId}`, updatedPartOfDay)
+      .then(() => {
+        reloadPartsOfDays();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const goToApiUrl = () => {
@@ -102,6 +132,7 @@ function App() {
           <th className="py-2 px-4 bg-gray-100 border text-left">Date</th>
           <th className="py-2 px-4 bg-gray-100 border text-left">Temps</th>
           <th className="py-2 px-4 bg-gray-100 border text-left">Action</th>
+          <th className="py-2 px-4 bg-gray-100 border text-left">Supprimer</th>
         </tr>
         </thead>
         <tbody>
@@ -112,8 +143,27 @@ function App() {
               className="py-2 px-4 border">{format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}</td>
             <td className="py-2 px-4 border">{format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}</td>
             <td className="py-2 px-4 border">
+              {partOfDay.attributes.status === "not_started" ? (
+                <button
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  onClick={() => handleStatusChange(partOfDay.id, partOfDay)}
+                >
+                  Commencer
+                </button>
+              ) : partOfDay.attributes.status === "in_progress" ? (
+                <button
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  onClick={() => handleStatusChange(partOfDay.id, partOfDay)}
+                >
+                  Finir
+                </button>
+              ) : (
+                ""
+              )}
+            </td>
+            <td className="py-2 px-4 border">
               <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                      onClick={() => stopPartOfDay(partOfDay.id)}>Stopper
+                      onClick={() => stopPartOfDay(partOfDay.id)}>Supprimer
               </button>
             </td>
           </tr>
