@@ -83,10 +83,12 @@ function App() {
 
   const handleStatusChange = (partOfDayId, partOfDay) => {
     const updatedPartOfDay = {
-      id: partOfDayId,
-      day: partOfDay.attributes.day,
-      scenario: partOfDay.attributes.scenario,
-      status: partOfDay.attributes.status === "not_started" ? "in_progress" : "completed",
+      data: {
+        id: partOfDayId,
+        day: partOfDay.attributes.day,
+        scenario: partOfDay.attributes.scenario,
+        status: partOfDay.attributes.status === "not_started" ? "in_progress" : "completed",
+      }
     };
     console.log(updatedPartOfDay)
     axios
@@ -158,7 +160,7 @@ function App() {
                   Finir
                 </button>
               ) : (
-                ""
+                <td className="py-2 px-4 border">Complété</td>
               )}
             </td>
             <td className="py-2 px-4 border">
