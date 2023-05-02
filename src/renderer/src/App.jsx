@@ -5,6 +5,7 @@ import {fr} from 'date-fns/locale';
 
 function App() {
   const [partsOfDays, setPartsOfDays] = useState([]);
+  const [filteredScenario, setFilteredScenario] = useState([]);
 
   useEffect(() => {
     axios
@@ -125,7 +126,11 @@ function App() {
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">Liste des parties de la journée</h1>
+      <h1
+        className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-center">
+        Liste des parties de la journée
+      </h1>
+
       <div className="flex justify-between items-center mb-8">
         <div className="inline-flex rounded-md shadow-sm" role="group">
           <button type="button"
@@ -139,7 +144,7 @@ function App() {
             Exporter
           </button>
           <button type="button"
-                  class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
                   onClick={reloadPartsOfDays}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                  stroke="currentColor" className="w-6 h-6 mr-2">
@@ -149,7 +154,7 @@ function App() {
             Recharger
           </button>
           <button type="button"
-                  class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
                   onClick={zoomIn}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                  stroke="currentColor" className="w-6 h-6 mr-2">
@@ -159,7 +164,7 @@ function App() {
             Zoomer
           </button>
           <button type="button"
-                  class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
                   onClick={zoomOut}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                  stroke="currentColor" className="w-6 h-6">
@@ -176,6 +181,12 @@ function App() {
           </button>
         </div>
       </div>
+      <input
+        type="text"
+        value={filteredScenario}
+        onChange={(e) => setFilteredScenario(e.target.value?.toLowerCase() || "")}
+        placeholder="Filtrer par scénario..."
+      />
       <div className="relative overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -198,44 +209,48 @@ function App() {
           </tr>
           </thead>
           <tbody>
-          {partsOfDays.map((partOfDay) => (
-            <tr key={partOfDay.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {partOfDay.attributes.scenario.data.attributes.title}
-              </th>
-              <td className="px-6 py-4">
-                {format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}
-              </td>
-              <td className="px-6 py-4">
-                {format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}
-              </td>
-              <td className="px-6 py-4">
-                {partOfDay.attributes.status === "not_started" ? (
-                  <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                          onClick={() => handleStatusChange(partOfDay.id, partOfDay)}>
-                    Commencer
+          {partsOfDays
+            .filter((partOfDay) =>
+              partOfDay.attributes.scenario.data.attributes.title.toLowerCase()
+                .includes(filteredScenario)
+            ).map((partOfDay) => (
+              <tr key={partOfDay.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  {partOfDay.attributes.scenario.data.attributes.title}
+                </th>
+                <td className="px-6 py-4">
+                  {format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}
+                </td>
+                <td className="px-6 py-4">
+                  {format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}
+                </td>
+                <td className="px-6 py-4">
+                  {partOfDay.attributes.status === "not_started" ? (
+                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                            onClick={() => handleStatusChange(partOfDay.id, partOfDay)}>
+                      Commencer
+                    </button>
+                  ) : partOfDay.attributes.status === "in_progress" ? (
+                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                            onClick={() => handleStatusChange(partOfDay.id, partOfDay)}>
+                      Finir
+                    </button>
+                  ) : (
+                    <span className="text-green-600">Complété</span>
+                  )}
+                </td>
+                <td className="py-2 px-4 border">
+                  {partOfDay.attributes.status === "completed" ? (
+                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                            onClick={() => restartParty(partOfDay.id, partOfDay)}
+                    >
+                      Relancer
+                    </button>) : null}
+                  <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                          onClick={() => stopPartOfDay(partOfDay.id)}>Supprimer
                   </button>
-                ) : partOfDay.attributes.status === "in_progress" ? (
-                  <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                          onClick={() => handleStatusChange(partOfDay.id, partOfDay)}>
-                    Finir
-                  </button>
-                ) : (
-                  <span className="text-green-600">Complété</span>
-                )}
-              </td>
-              <td className="py-2 px-4 border">
-                {partOfDay.attributes.status === "completed" ? (
-                  <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                          onClick={() => restartParty(partOfDay.id, partOfDay)}
-                  >
-                    Relancer
-                  </button>) : null}
-                <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                        onClick={() => stopPartOfDay(partOfDay.id)}>Supprimer
-                </button>
-              </td>
-            </tr>))}
+                </td>
+              </tr>))}
           </tbody>
         </table>
       </div>
