@@ -56,18 +56,6 @@ function App() {
     container.style.zoom = `${newZoom}%`;
   };
 
-  const updatePartOfDayStatus = (partOfDayId, newStatus) => {
-    axios
-      .put(`http://localhost:1337/api/parts-of-days/${partOfDayId}`, {
-        status: newStatus
-      })
-      .then(() => {
-        reloadPartsOfDays();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
   const stopPartOfDay = (partOfDayId) => {
     if (window.confirm("Are you sure you want to stop this part of day?")) {
       axios
