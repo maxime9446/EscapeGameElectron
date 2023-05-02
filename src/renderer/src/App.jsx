@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:1337/api/parts-of-days")
+      .get("http://localhost:1337/api/parts-of-days?populate=*")
       .then((response) => {
         setPartsOfDays(response.data.data);
       })
@@ -18,8 +18,9 @@ function App() {
   }, []);
 
   const exportPartsOfDays = () => {
+
     const exportData = partsOfDays.map(
-      (partOfDay) => `${partOfDay.attributes.day}\n`
+      (partOfDay) => `${partOfDay.attributes.scenario.data.attributes.title}, ${format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}, ${format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}, ${partOfDay.attributes.status}\n`
     );
     const dataBlob = new Blob([exportData], {type: "text/plain"});
     const url = URL.createObjectURL(dataBlob);
@@ -32,7 +33,7 @@ function App() {
 
   const reloadPartsOfDays = () => {
     axios
-      .get("http://localhost:1337/api/parts-of-days")
+      .get("http://localhost:1337/api/parts-of-days?populate=*")
       .then((response) => {
         setPartsOfDays(response.data.data);
       })
@@ -97,6 +98,7 @@ function App() {
       <table className="w-full">
         <thead>
         <tr>
+          <th className="py-2 px-4 bg-gray-100 border text-left">Scénarios</th>
           <th className="py-2 px-4 bg-gray-100 border text-left">Date</th>
           <th className="py-2 px-4 bg-gray-100 border text-left">Temps</th>
           <th className="py-2 px-4 bg-gray-100 border text-left">Action</th>
@@ -105,9 +107,10 @@ function App() {
         <tbody>
         {partsOfDays.map((partOfDay) => (
           <tr key={partOfDay.id}>
+            <td className="py-2 px-4 border">{partOfDay.attributes.scenario.data.attributes.title}</td>
             <td
               className="py-2 px-4 border">{format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}</td>
-            <td className="py-2 px-4 border">{format(new Date(partOfDay.attributes.day), 'HH:mm:ss', {locale: fr})}</td>
+            <td className="py-2 px-4 border">{format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}</td>
             <td className="py-2 px-4 border">
               <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                       onClick={() => stopPartOfDay(partOfDay.id)}>Stopper
