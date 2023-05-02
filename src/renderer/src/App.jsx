@@ -57,18 +57,6 @@ function App() {
     container.style.zoom = `${newZoom}%`;
   };
 
-  const updatePartOfDayStatus = (partOfDayId, newStatus) => {
-    axios
-      .put(`http://localhost:1337/api/parts-of-days/${partOfDayId}`, {
-        status: newStatus
-      })
-      .then(() => {
-        reloadPartsOfDays();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
   const stopPartOfDay = (partOfDayId) => {
     if (window.confirm("Are you sure you want to stop this part of day?")) {
       axios
@@ -211,7 +199,7 @@ function App() {
           <tbody>
           {partsOfDays
             .filter((partOfDay) =>
-              partOfDay.attributes.scenario.data.attributes.title.toLowerCase()
+              partOfDay.attributes.scenario.data.attributes.title?.toLowerCase()
                 .includes(filteredScenario)
             ).map((partOfDay) => (
               <tr key={partOfDay.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -232,7 +220,11 @@ function App() {
                     </button>
                   ) : partOfDay.attributes.status === "in_progress" ? (
                     <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                            onClick={() => handleStatusChange(partOfDay.id, partOfDay)}>
+                            onClick={() => {
+                              if (window.confirm("Êtes-vous sûr de vouloir terminer cette partie ?")) {
+                                handleStatusChange(partOfDay.id, partOfDay);
+                              }
+                            }}>
                       Finir
                     </button>
                   ) : (
