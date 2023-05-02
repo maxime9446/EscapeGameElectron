@@ -90,7 +90,6 @@ function App() {
         status: partOfDay.attributes.status === "not_started" ? "in_progress" : "completed",
       }
     };
-    console.log(updatedPartOfDay)
     axios
       .put(`http://localhost:1337/api/parts-of-days/${partOfDayId}`, updatedPartOfDay)
       .then(() => {
@@ -101,6 +100,24 @@ function App() {
       });
   };
 
+  const restartParty = (partOfDayId, partOfDay) => {
+    const updatedPartOfDay = {
+      data: {
+        id: partOfDayId,
+        day: partOfDay.attributes.day,
+        scenario: partOfDay.attributes.scenario,
+        status: partOfDay.attributes.status = "not_started",
+      }
+    };
+    axios
+      .put(`http://localhost:1337/api/parts-of-days/${partOfDayId}`, updatedPartOfDay)
+      .then(() => {
+        reloadPartsOfDays();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   const goToApiUrl = () => {
     window.location.href = "http://localhost:1337/";
   };
@@ -164,6 +181,13 @@ function App() {
               )}
             </td>
             <td className="py-2 px-4 border">
+              {partOfDay.attributes.status === "completed" ? (
+                <button
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  onClick={() => restartParty(partOfDay.id, partOfDay)}
+                >
+                  Relancer
+                </button>) : null}
               <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                       onClick={() => stopPartOfDay(partOfDay.id)}>Supprimer
               </button>
