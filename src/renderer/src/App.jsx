@@ -28,13 +28,13 @@ function App() {
     );
     const exportData = todayPartsOfDays.map(
       (partOfDay) =>
-        `${partOfDay.attributes.scenario.data.attributes.title}, ${format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}, ${format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}, ${partOfDay.attributes.status}\n`
+        `${partOfDay.attributes.scenario.data.attributes.title}, ${partOfDay.attributes.room.data.attributes.name}, ${format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}, ${format(new Date(partOfDay.attributes.day), 'HH:mm', {locale: fr})}, ${partOfDay.attributes.status}\n`
     );
     const dataBlob = new Blob([exportData], {type: "text/plain"});
     const url = URL.createObjectURL(dataBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "partsOfDays.txt";
+    a.download = "listeDesPartiesDeLaJournee.txt";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -193,6 +193,9 @@ function App() {
               Scénarios
             </th>
             <th scope="col" className="px-6 py-3">
+              Salle
+            </th>
+            <th scope="col" className="px-6 py-3">
               Date
             </th>
             <th scope="col" className="px-6 py-3">
@@ -217,6 +220,9 @@ function App() {
                   {partOfDay.attributes.scenario.data.attributes.title}
                 </th>
                 <td className="px-6 py-4">
+                  {partOfDay.attributes.room.data.attributes.name}
+                </td>
+                <td className="px-6 py-4">
                   {format(new Date(partOfDay.attributes.day), 'dd MMMM yyyy', {locale: fr})}
                 </td>
                 <td className="px-6 py-4">
@@ -229,16 +235,16 @@ function App() {
                       Commencer
                     </button>
                   ) : partOfDay.attributes.status === "in_progress" ? (
-                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                             onClick={() => {
                               if (window.confirm("Êtes-vous sûr de vouloir terminer cette partie ?")) {
                                 handleStatusChange(partOfDay.id, partOfDay);
                               }
                             }}>
-                      Finir
+                      Stop
                     </button>
                   ) : (
-                    <span className="text-green-600">Complété</span>
+                    <span className="text-green-600">Terminer</span>
                   )}
                 </td>
                 <td className="py-2 px-4 border">
