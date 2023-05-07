@@ -16,15 +16,12 @@ $ npm install
 $ npm run dev
 ```
 
-### Build
+## Api
 
-```bash
-# For windows
-$ npm run build:win
+[Strapi](https://github.com/maxime9446/EscapeGame/tree/master/back-strapi)
 
-# For macOS
-$ npm run build:mac
 
-# For Linux
-$ npm run build:linux
-```
+
+## Authors
+
+- [@maxime9446](https://github.com/maxime9446)
