@@ -22,7 +22,7 @@ function App() {
   }, []);
 
   const exportPartsOfDays = () => {
-    const today = new Date().setHours(0, 0, 0, 0); // Récupère la date d'aujourd'hui à minuit
+    const today = new Date().setHours(0, 0, 0, 0);
     const todayPartsOfDays = partsOfDays.filter(
       (partOfDay) => new Date(partOfDay.attributes.day).setHours(0, 0, 0, 0) === today
     );
